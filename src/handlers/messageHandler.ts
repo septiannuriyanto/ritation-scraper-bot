@@ -3,20 +3,23 @@
 import { parseRitasiReport } from '../parser';
 import { insertRitasi } from '../supabase';
 
+const formatDateForSupabase = (input: string): string | null => {
+  const match = input.match(/(\d{2})\/(\d{2})\/(\d{4})/);
+  if (!match) return null;
 
-const formatDateForSupabase = (date: Date) => {
-  if (!date) return null;
-
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0'); // getMonth() returns 0-based month, so add 1
-  const day = String(date.getDate()).padStart(2, '0');
-
+  const [, day, month, year] = match;
   return `${year}-${month}-${day}`;
 };
 
 export async function handleMessage(message: string, timestamp: number) {
-  // Format tanggal: YYYY-MM-DD
-  const reportDate = formatDateForSupabase(new Date());
+  const lines = message.split('\n');
+  const header = lines[0]; // Ambil baris pertama
+  const reportDate = formatDateForSupabase(header);
+
+  if (!reportDate) {
+    console.log('⚠️ Gagal ambil tanggal dari judul laporan.');
+    return;
+  }
 
   const entries = parseRitasiReport(message);
   if (entries.length === 0) {
@@ -25,5 +28,5 @@ export async function handleMessage(message: string, timestamp: number) {
   }
 
   console.log('📦 Parsed entries:', entries);
-  await insertRitasi(entries, reportDate!);
+  await insertRitasi(entries, reportDate);
 }
