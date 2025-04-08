@@ -10,6 +10,11 @@
   "devDependencies": {
     "@types/dotenv": "^6.1.1",
     "@types/express": "^5.0.1",
-    "@types/qrcode-terminal": "^0.12.2"
+    "@types/qrcode-terminal": "^0.12.2",
+    "electron": "^35.1.4"
+  },
+  "scripts": {
+    "start": "electron main.js",
+    "build": "tsc"
   }
 }
